@@ -27,6 +27,7 @@ class Recipe(custom.GStreamer):
                      'hls': 'enabled',
                      'hls-crypto': 'openssl',
                      'isac': 'enabled',
+                     'kms': 'enabled',
                      'ladspa': 'auto', # lrdf is optional
                      'openh264': 'enabled',
                      'openjpeg': 'enabled',
@@ -490,6 +491,10 @@ class Recipe(custom.GStreamer):
               'share/gst-android/ndk-build',
             ]
     }
+
+    patches = [
+        name + '/0001-enable-kmssink-for-Android.patch',
+    ]
 
     def prepare(self):
         # Disable Cocoa NSApp integration since we enable the Cocoa MainLoop

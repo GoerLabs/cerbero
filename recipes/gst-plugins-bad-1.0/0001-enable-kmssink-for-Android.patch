@@ -1,0 +1,23 @@
+From cccc24458924c4d324dcdb620b72d270f661e729 Mon Sep 17 00:00:00 2001
+From: Yonghua Zheng <yonghua.zheng@goertek.com>
+Date: Tue, 26 Sep 2023 13:46:38 +0800
+Subject: [PATCH] enable kmssink for Android
+
+Many platforms runs Android on top of Linux DRM graphics system.
+
+diff --git a/subprojects/gst-plugins-bad/sys/kms/meson.build b/subprojects/gst-plugins-bad/sys/kms/meson.build
+index dddd7d85c0..54ae00b1bd 100644
+--- a/subprojects/gst-plugins-bad/sys/kms/meson.build
++++ b/subprojects/gst-plugins-bad/sys/kms/meson.build
+@@ -6,7 +6,7 @@ kmssink_sources = [
+ ]
+ extra_deps = []
+ 
+-if host_system != 'linux'
++if host_system != 'linux' and host_system != 'android'
+   subdir_done()
+ endif
+ 
+-- 
+2.34.1
+
