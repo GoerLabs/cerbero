@@ -1,0 +1,44 @@
+# -*- Mode: Python -*- vi:si:et:sw=4:sts=4:ts=4:syntax=python
+from cerbero.tools.libtool import LibtoolLibrary
+
+class Recipe(recipe.Recipe):
+    name = 'libdrm'
+    version = '2.4.116'
+
+    stype = SourceType.TARBALL
+    url = 'https://dri.freedesktop.org/libdrm/libdrm-%(version)s.tar.xz'
+    # sha256
+    tarball_checksum = '46c53f40735ea3d26d614297f155f6131a510624a24274f654f6469ca905339a'
+
+    btype = BuildType.MESON
+    licenses = [{License.BSD: ['COPYING'], License.Misc: ['LICENSE']}]
+    meson_options = {
+        'intel': 'disabled',
+        'radeon': 'disabled',
+        'amdgpu': 'disabled',
+        'nouveau': 'disabled',
+        'vmwgfx': 'disabled',
+        'omap': 'disabled',
+        'exynos': 'disabled',
+        'freedreno': 'disabled',
+        'tegra': 'disabled',
+        'vc4': 'disabled',
+        'etnaviv': 'disabled',
+        'man-pages': 'disabled',
+        'valgrind': 'disabled',
+    }
+
+    deps = []
+
+    patches = [
+        name + '/0001-fix-compile-issue-due-to-no-support-to-open_memstrea.patch',
+        name + '/0001-add-COPYING.patch',
+        name + '/0001-add-LICENSE.patch',
+    ]
+
+    files_libs = ['libdrm']
+    files_devel = ['include/libdrm', '%(libdir)s/pkgconfig/libdrm.pc']
+
+    def post_install(self):
+        LibtoolLibrary('libdrm', None, None, None, self.config.libdir, self.config.target_platform).save()
+        super().post_install()
