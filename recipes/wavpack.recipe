@@ -25,6 +25,7 @@ class Recipe(recipe.Recipe):
     patches = [
         name + '/0001-cmake-Don-t-name-MSVC-DLL-wavpackdll.dll.patch',
         name + '/0001-cmake-Set-SOVERSION-to-match-Autotools.patch',
+        name + '/0001-fix-TRY_RUN-when-cross-compile.patch',
     ]
 
     files_libs = ['libwavpack']

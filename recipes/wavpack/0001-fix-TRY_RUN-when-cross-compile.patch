@@ -1,0 +1,74 @@
+From 7fe4e88260781fa71995a00418c4ed74b48d241c Mon Sep 17 00:00:00 2001
+From: Yonghua Zheng <yonghua.zheng@goertek.com>
+Date: Tue, 26 Sep 2023 13:15:49 +0800
+Subject: [PATCH] fix TRY_RUN when cross compile
+
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index a066724..87b36d8 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -315,35 +315,37 @@ set(WAVPACK_EXPORT_SYMBOLS
+     WavpackWriteTag
+ )
+ 
+-if(BUILD_SHARED_LIBS AND (WIN32 OR CYGWIN))
+-    set(FILE_CONTENTS "EXPORTS\n")
+-    foreach(EXPORT_SYMBOL ${WAVPACK_EXPORT_SYMBOLS})
+-        list(APPEND FILE_CONTENTS "    ${EXPORT_SYMBOL}\n")
+-    endforeach()
++if(BUILD_SHARED_LIBS)
++    if(WIN32 OR CYGWIN)
++        set(FILE_CONTENTS "EXPORTS\n")
++        foreach(EXPORT_SYMBOL ${WAVPACK_EXPORT_SYMBOLS})
++            list(APPEND FILE_CONTENTS "    ${EXPORT_SYMBOL}\n")
++        endforeach()
+ 
+     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/libwavpack.def ${FILE_CONTENTS})
+     target_sources(wavpack PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/libwavpack.def)
+ 
+-elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+-    set(FILE_CONTENTS "")
+-    foreach(EXPORT_SYMBOL ${WAVPACK_EXPORT_SYMBOLS})
+-        list(APPEND FILE_CONTENTS "_${EXPORT_SYMBOL}\n")
+-    endforeach()
+-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/libwavpack.sym ${FILE_CONTENTS})
+-    target_link_libraries(wavpack PRIVATE "-Wl,-exported_symbols_list,'${CMAKE_CURRENT_BINARY_DIR}/libwavpack.sym'")
+-else()
+-    set(CONFTTEST_CONTENTS "VERS_1 {\n    global: sym\;\n\n};\n\nVERS_2 {\n    global: sym;\n} VERS_1\;")
+-    file(WRITE ${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/conftest.map "${CONFTTEST_CONTENTS}")
+-    check_c_linker_flag("-Wl,--version-script='${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/conftest.map'" COMPILER_SUPPORTS_SYMBOL_MAPS)
+-
+-    if(COMPILER_SUPPORTS_SYMBOL_MAPS)
+-        set(FILE_CONTENTS "{ global:\n")
++    elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
++        set(FILE_CONTENTS "")
+         foreach(EXPORT_SYMBOL ${WAVPACK_EXPORT_SYMBOLS})
+-            list(APPEND FILE_CONTENTS "${EXPORT_SYMBOL}\;\n")
++            list(APPEND FILE_CONTENTS "_${EXPORT_SYMBOL}\n")
+         endforeach()
+-        list(APPEND FILE_CONTENTS "local: *\; }\;")
+-        file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/libwavpack.map ${FILE_CONTENTS})
+-        target_link_libraries(wavpack PRIVATE "-Wl,--version-script='${CMAKE_CURRENT_BINARY_DIR}/libwavpack.map';-Wl,-no-undefined")
++        file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/libwavpack.sym ${FILE_CONTENTS})
++        target_link_libraries(wavpack PRIVATE "-Wl,-exported_symbols_list,'${CMAKE_CURRENT_BINARY_DIR}/libwavpack.sym'")
++    else()
++        set(CONFTTEST_CONTENTS "VERS_1 {\n    global: sym\;\n\n};\n\nVERS_2 {\n    global: sym;\n} VERS_1\;")
++        file(WRITE ${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/conftest.map "${CONFTTEST_CONTENTS}")
++        check_c_linker_flag("-Wl,--version-script='${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/conftest.map'" COMPILER_SUPPORTS_SYMBOL_MAPS)
++
++        if(COMPILER_SUPPORTS_SYMBOL_MAPS)
++            set(FILE_CONTENTS "{ global:\n")
++            foreach(EXPORT_SYMBOL ${WAVPACK_EXPORT_SYMBOLS})
++                list(APPEND FILE_CONTENTS "${EXPORT_SYMBOL}\;\n")
++            endforeach()
++            list(APPEND FILE_CONTENTS "local: *\; }\;")
++            file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/libwavpack.map ${FILE_CONTENTS})
++            target_link_libraries(wavpack PRIVATE "-Wl,--version-script='${CMAKE_CURRENT_BINARY_DIR}/libwavpack.map';-Wl,-no-undefined")
++        endif()
+     endif()
+ endif()
+ 
+-- 
+2.34.1
+
