@@ -1,0 +1,22 @@
+From 5b4689ebf2b5033f1cda1fd334b8e838f51d695e Mon Sep 17 00:00:00 2001
+From: Yonghua Zheng <yonghua.zheng@goertek.com>
+Date: Tue, 26 Sep 2023 17:41:49 +0800
+Subject: [PATCH] add sprd for UNCSOC drm driver
+
+
+diff --git a/subprojects/gst-plugins-bad/sys/kms/gstkmssink.c b/subprojects/gst-plugins-bad/sys/kms/gstkmssink.c
+index c798a16f0f..09fac31870 100644
+--- a/subprojects/gst-plugins-bad/sys/kms/gstkmssink.c
++++ b/subprojects/gst-plugins-bad/sys/kms/gstkmssink.c
+@@ -480,7 +480,7 @@ gst_kms_sink_video_overlay_init (GstVideoOverlayInterface * iface)
+ static int
+ kms_open (gchar ** driver)
+ {
+-  static const char *drivers[] = { "i915", "radeon", "nouveau", "vmwgfx",
++  static const char *drivers[] = { "sprd", "i915", "radeon", "nouveau", "vmwgfx",
+     "exynos", "amdgpu", "imx-drm", "imx-lcdif", "rockchip", "atmel-hlcdc",
+     "msm", "xlnx", "vc4", "meson", "stm", "sun4i-drm", "mxsfb-drm", "tegra",
+     "xilinx_drm",               /* DEPRECATED. Replaced by xlnx */
+-- 
+2.34.1
+

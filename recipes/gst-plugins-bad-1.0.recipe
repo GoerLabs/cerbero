@@ -494,6 +494,7 @@ class Recipe(custom.GStreamer):
 
     patches = [
         name + '/0001-enable-kmssink-for-Android.patch',
+        name + '/0001-add-sprd-for-UNCSOC-drm-driver.patch',
     ]
 
     def prepare(self):
